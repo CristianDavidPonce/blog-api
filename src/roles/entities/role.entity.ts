@@ -1,23 +1,35 @@
-import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Permission } from 'src/permissions/entities/permission.entity'
+import { User } from 'src/users/entities/user.entity'
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
 
 @Entity()
 export class Role {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
-  @Column()
-  name: string;
+  @Column({ unique: true })
+  name: string
 
   @Column({ nullable: true })
-  description: string;
+  description: string
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  createdAt: Date
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
+  updatedAt: Date
 
   @ManyToOne(() => User, (user) => user.roles)
-  user: User;
+  user: User
+
+  @ManyToMany(() => Permission)
+  @JoinTable()
+  permissions: Permission[]
 }

@@ -8,33 +8,47 @@ import {
   Delete,
   HttpException,
   HttpStatus,
-} from '@nestjs/common';
-import { RolesService } from './roles.service';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
+} from '@nestjs/common'
+import { RolesService } from './roles.service'
+import { CreateRoleDto } from './dto/create-role.dto'
+import { UpdateRoleDto } from './dto/update-role.dto'
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(createRoleDto);
+  async create(@Body() createRoleDto: CreateRoleDto) {
+    return await this.rolesService
+      .create(createRoleDto)
+      .catch(
+        (e) =>
+          new HttpException(
+            { message: e.message || 'Error', details: e },
+            HttpStatus.BAD_REQUEST,
+          ),
+      )
   }
 
   @Get()
-  findAll() {
-    return this.rolesService.findAll();
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    return this.rolesService.findAll({ page, limit })
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(+id);
+    return this.rolesService.findOne(+id)
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
+    return this.rolesService.update(+id, updateRoleDto)
   }
 
   @Delete(':id')
@@ -43,7 +57,7 @@ export class RolesController {
       throw new HttpException(
         { message: err.message, code: HttpStatus.BAD_REQUEST },
         HttpStatus.BAD_REQUEST,
-      );
-    });
+      )
+    })
   }
 }
