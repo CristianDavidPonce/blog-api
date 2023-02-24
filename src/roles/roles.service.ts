@@ -6,7 +6,7 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate'
 import { Permission } from 'src/permissions/entities/permission.entity'
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { CreateRoleDto } from './dto/create-role.dto'
 import { UpdateRoleDto } from './dto/update-role.dto'
 import { Role } from './entities/role.entity'
@@ -19,42 +19,34 @@ export class RolesService {
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>,
   ) {}
-  async create(createRoleDto: CreateRoleDto) {
-    const permissions: Permission[] = []
-    for (let i = 0; i < createRoleDto.permissions.length; i++) {
-      await this.permissionRepository
-        .findOne({
-          where: {
-            id: createRoleDto.permissions[i],
-          },
-        })
-        .then((x) => {
-          permissions.push(x)
-        })
-        .catch((e) => {
-          throw new Error(e)
-        })
-    }
-    const newRol = this.roleRepository.create({
-      ...createRoleDto,
-      permissions: [],
+  async create({ permissions, ...createRoleDto }: CreateRoleDto) {
+    const record = this.roleRepository.create(createRoleDto)
+    record.permissions = await this.permissionRepository.findBy({
+      id: In(permissions),
     })
-    newRol.permissions = permissions
-    return this.roleRepository.save(newRol)
+    return this.roleRepository.save(record)
   }
 
   async findAll(options: IPaginationOptions): Promise<Pagination<Role>> {
     return paginate<Role>(this.roleRepository, options, {
-      relations: { permissions: true },
+      relations: { permissions: true, users: true },
     })
   }
 
   findOne(id: number) {
-    return this.roleRepository.findOne({ where: { id } })
+    return this.roleRepository.findOne({
+      where: { id },
+      relations: { permissions: true },
+    })
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`
+  async update(id: number, { permissions, ...updateRoleDto }: UpdateRoleDto) {
+    const record = this.roleRepository.create(updateRoleDto)
+    record.permissions = await this.permissionRepository.findBy({
+      id: In(permissions),
+    })
+    record.id = id
+    return this.roleRepository.save(record)
   }
 
   async remove(id: number) {

@@ -1,41 +1,41 @@
-import { IsEmail, IsPhoneNumber } from 'class-validator';
-import { Role } from '../../../src/roles/entities/role.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { IsEmail, IsPhoneNumber } from 'class-validator'
+import { Role } from '../../../src/roles/entities/role.entity'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ unique: true })
-  userName: string;
+  userName: string
 
   @Column()
-  password: string;
+  password: string
 
   @Column()
-  firstName: string;
+  firstName: string
 
   @Column()
-  lastName: string;
+  lastName: string
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ nullable: true })
   @IsEmail()
-  email: string;
+  email: string
 
   @Column({ nullable: true })
   @IsPhoneNumber('EC')
-  phone: string;
+  phone: string
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
-  createAt: Date;
+  createAt: Date
 
   @Column()
-  createdBy: string;
+  createdBy: string
 
-  @OneToMany(() => Role, (role) => role.user)
-  roles: Role[];
+  @ManyToOne(() => Role, (role) => role.users)
+  role: Role
 }

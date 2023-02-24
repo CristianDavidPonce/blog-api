@@ -47,8 +47,16 @@ export class RolesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto)
+  async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
+    return await this.rolesService
+      .update(+id, updateRoleDto)
+      .catch(
+        (e) =>
+          new HttpException(
+            { message: e.message, details: e },
+            HttpStatus.BAD_REQUEST,
+          ),
+      )
   }
 
   @Delete(':id')

@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from 'typeorm'
 export default new DataSource({
   type: 'mysql',
   host: 'containers-us-west-80.railway.app',
@@ -8,4 +8,4 @@ export default new DataSource({
   database: 'railway',
   entities: ['./src/../**/*.entity.ts', './src/../**/*.entity.js'],
   migrations: ['./src/database/migrations/*{.ts,.js}'],
-});
+})

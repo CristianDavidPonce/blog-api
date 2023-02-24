@@ -3,6 +3,8 @@ import { AppService } from './app.service'
 import { LocalAuthGuard } from './auth/auth.local-auth.guards'
 import { AuthService, IUser } from './auth/auth.service'
 import { JwtAuthGuard } from './auth/jwt-auth.guard'
+import { PermissionsGuard } from './permissions/permission.guard'
+import { Permissions } from './permissions/permissions.decorator'
 
 @Controller()
 export class AppController {
@@ -21,7 +23,8 @@ export class AppController {
     return this.authService.login(req.user)
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Permissions({ module: 'users', action: 'read' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get('profile')
   getProfile(@Request() req: { user: IUser }) {
     return req.user

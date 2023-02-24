@@ -5,7 +5,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
-  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 
@@ -26,10 +26,10 @@ export class Role {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date
 
-  @ManyToOne(() => User, (user) => user.roles)
-  user: User
+  @OneToMany(() => User, (user) => user.role)
+  users: User[]
 
-  @ManyToMany(() => Permission)
+  @ManyToMany(() => Permission, { cascade: true })
   @JoinTable()
   permissions: Permission[]
 }

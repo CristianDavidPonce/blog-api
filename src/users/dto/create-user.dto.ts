@@ -4,5 +4,5 @@ export class CreateUserDto {
   isActive: boolean
   firstName: string
   lastName: string
-  roles: number[]
+  role: number
 }

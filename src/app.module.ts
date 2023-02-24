@@ -6,6 +6,8 @@ import { UsersModule } from './users/users.module'
 import { AuthModule } from './auth/auth.module'
 import { RolesModule } from './roles/roles.module'
 import { PermissionsModule } from './permissions/permissions.module'
+import { APP_GUARD } from '@nestjs/core'
+import { PermissionsGuard } from './permissions/permission.guard'
 
 @Module({
   imports: [
