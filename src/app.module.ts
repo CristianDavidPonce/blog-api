@@ -6,23 +6,21 @@ import { UsersModule } from './users/users.module'
 import { AuthModule } from './auth/auth.module'
 import { RolesModule } from './roles/roles.module'
 import { PermissionsModule } from './permissions/permissions.module'
-import { APP_GUARD } from '@nestjs/core'
-import { PermissionsGuard } from './permissions/permission.guard'
+import { ConfigModule } from '@nestjs/config'
+import { config } from './config'
+import { DatabaseConfig } from './database.config'
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
+    }),
     AuthModule,
     UsersModule,
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'containers-us-west-80.railway.app',
-      port: 5873,
-      username: 'root',
-      password: 'Du5cAVygRmBKoey5S1A0',
-      database: 'railway',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: DatabaseConfig,
     }),
     RolesModule,
     PermissionsModule,
