@@ -11,19 +11,30 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  UseGuards,
+  Req,
 } from '@nestjs/common'
 import { RolesService } from './roles.service'
 import { CreateRoleDto } from './dto/create-role.dto'
 import { UpdateRoleDto } from './dto/update-role.dto'
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
+import { IUser } from 'src/auth/auth.service'
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
-
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createRoleDto: CreateRoleDto) {
+  async create(
+    @Req() req: { user: IUser },
+    @Body() createRoleDto: CreateRoleDto,
+  ) {
     return await this.rolesService
-      .create(createRoleDto)
+      .create({
+        ...createRoleDto,
+        createdBy: req.user.id,
+        createdByName: req.user.firstName + req.user.lastName,
+      })
       .catch(
         (e) =>
           new HttpException(
@@ -46,10 +57,19 @@ export class RolesController {
     return this.rolesService.findOne(+id)
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+    @Req() req: { user: IUser },
+  ) {
     return await this.rolesService
-      .update(+id, updateRoleDto)
+      .update(+id, {
+        ...updateRoleDto,
+        updatedBy: req.user.id,
+        updatedByName: req.user.firstName + req.user.lastName,
+      })
       .catch(
         (e) =>
           new HttpException(

@@ -12,6 +12,7 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   UseGuards,
+  ParseBoolPipe,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -58,9 +59,13 @@ export class UsersController {
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('isActive', new DefaultValuePipe(true), ParseBoolPipe)
+    isActive: boolean,
+    @Query('search') search: string,
+    @Query('order') order: string,
   ) {
     return await this.usersService
-      .findAll({ page, limit })
+      .findAll({ page, limit }, { isActive, search, order })
       .catch(
         (e) =>
           new HttpException(
@@ -92,8 +97,8 @@ export class UsersController {
     return res
   }
 
-  @Permissions({ module: 'users', action: 'delete' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions({ module: 'users', action: 'delete' })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id)

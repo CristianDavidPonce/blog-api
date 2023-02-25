@@ -6,7 +6,7 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate'
 import { Role } from 'src/roles/entities/role.entity'
-import { Repository } from 'typeorm'
+import { In, Like, Repository } from 'typeorm'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { User } from './entities/user.entity'
@@ -15,7 +15,7 @@ import { User } from './entities/user.entity'
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
   ) {}
@@ -25,8 +25,17 @@ export class UsersService {
     return this.userRepository.save(record)
   }
 
-  async findAll(options: IPaginationOptions): Promise<Pagination<User>> {
+  async findAll(
+    options: IPaginationOptions,
+    { isActive, search, order },
+  ): Promise<Pagination<User>> {
+    const sort = order && JSON.parse(order)
     return paginate<User>(this.userRepository, options, {
+      where: {
+        ...(search ? { userName: Like(`%${search}%`) } : {}),
+        ...(isActive !== undefined ? { isActive: isActive } : {}),
+      },
+      order: sort,
       relations: { role: { permissions: true } },
     })
   }
@@ -50,18 +59,6 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    return await this.userRepository
-      .createQueryBuilder()
-      .delete()
-      .from(User)
-      .where({ id })
-      .execute()
-      .catch(
-        (e) =>
-          new HttpException(
-            { message: e.message, details: e },
-            HttpStatus.BAD_REQUEST,
-          ),
-      )
+    return await this.userRepository.delete({ id })
   }
 }

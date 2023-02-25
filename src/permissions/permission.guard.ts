@@ -21,7 +21,7 @@ export class PermissionsGuard implements CanActivate {
     const { user } = context.switchToHttp().getRequest()
 
     const record = await this.userService.findOne(user.id)
-    console.log(record)
+
     return record.role.permissions.some(
       (x) =>
         requiredPermissions.some((y) => y.action === x.action) &&

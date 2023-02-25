@@ -1,16 +1,25 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common'
 import { AppService } from './app.service'
 import { LocalAuthGuard } from './auth/auth.local-auth.guards'
 import { AuthService, IUser } from './auth/auth.service'
 import { JwtAuthGuard } from './auth/jwt-auth.guard'
 import { PermissionsGuard } from './permissions/permission.guard'
-import { Permissions } from './permissions/permissions.decorator'
+import { UsersService } from './users/users.service'
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private authService: AuthService,
+    private userService: UsersService,
   ) {}
 
   @Get()
@@ -23,10 +32,14 @@ export class AppController {
     return this.authService.login(req.user)
   }
 
-  @Permissions({ module: 'users', action: 'read' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get('profile')
-  getProfile(@Request() req: { user: IUser }) {
-    return req.user
+  async getProfile(@Request() req: { user: IUser }) {
+    return await this.userService.findOne(req.user.id).catch((e) => {
+      new HttpException(
+        { message: e.message, detail: e },
+        HttpStatus.BAD_REQUEST,
+      )
+    })
   }
 }

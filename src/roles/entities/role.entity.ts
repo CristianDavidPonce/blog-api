@@ -5,7 +5,9 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 
@@ -25,6 +27,18 @@ export class Role {
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date
+
+  @Column({ nullable: true })
+  createdBy: number
+
+  @Column({ default: 'SYSTEM' })
+  createdByName: string
+
+  @Column({ nullable: true })
+  updatedBy: number
+
+  @Column({ default: 'SYSTEM' })
+  updatedByName: string
 
   @OneToMany(() => User, (user) => user.role)
   users: User[]

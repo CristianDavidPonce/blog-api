@@ -29,14 +29,14 @@ export class RolesService {
 
   async findAll(options: IPaginationOptions): Promise<Pagination<Role>> {
     return paginate<Role>(this.roleRepository, options, {
-      relations: { permissions: true, users: true },
+      relations: { permissions: true },
     })
   }
 
   findOne(id: number) {
     return this.roleRepository.findOne({
       where: { id },
-      relations: { permissions: true },
+      relations: { permissions: true, users: true },
     })
   }
 
