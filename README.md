@@ -1,3 +1,6 @@
+## Project
+
+BLOG-API
 ## Description
 
 This project is for practice NestJS framework
@@ -34,13 +37,9 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
 ## Stay in touch
 
-- Author - [Cristian Ponce](https://cristianponce.com)
+- Author - [Cristian Ponce](https://wwww.cristianponce.com)
 
 ## License
 
