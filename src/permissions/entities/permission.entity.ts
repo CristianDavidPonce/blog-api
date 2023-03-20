@@ -2,7 +2,7 @@ import { Record } from 'src/common/record.common'
 import { Enumerate } from 'src/utils'
 import { Column, Entity, Index } from 'typeorm'
 
-export type moduleType = 'users' | 'blogs' | 'roles'
+export type moduleType = 'users' | 'blogs' | 'roles' | 'tags' | 'comments'
 export type actionType = 'read' | 'edit' | 'create' | 'delete'
 
 export const module = new Enumerate<moduleType>([
@@ -17,6 +17,14 @@ export const module = new Enumerate<moduleType>([
   {
     value: 'roles',
     label: 'Roles',
+  },
+  {
+    value: 'comments',
+    label: 'Comentarios',
+  },
+  {
+    value: 'tags',
+    label: 'Tags',
   },
 ])
 export const action = new Enumerate<actionType>([
