@@ -39,7 +39,7 @@ $ npm run test:cov
 
 ## Stay in touch
 
-- Author - [Cristian Ponce](https://wwww.cristianponce.com)
+- Author - [Cristian Ponce](https://www.cristianponce.com)
 
 ## License
 
