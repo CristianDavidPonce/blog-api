@@ -19,11 +19,15 @@ import { CreateRoleDto } from './dto/create-role.dto'
 import { UpdateRoleDto } from './dto/update-role.dto'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { IUser } from 'src/auth/auth.service'
+import { userReq } from 'src/common/record.common'
+import { Permissions } from 'src/permissions/permissions.decorator'
+import { PermissionsGuard } from 'src/permissions/permission.guard'
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
-  @UseGuards(JwtAuthGuard)
+  @Permissions({ module: 'roles', action: 'create' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Post()
   async create(
     @Req() req: { user: IUser },
@@ -32,8 +36,7 @@ export class RolesController {
     return await this.rolesService
       .create({
         ...createRoleDto,
-        createdBy: req.user.id,
-        createdByName: req.user.firstName + req.user.lastName,
+        ...userReq(req.user, 'create'),
       })
       .catch(
         (e) =>
@@ -67,8 +70,7 @@ export class RolesController {
     return await this.rolesService
       .update(+id, {
         ...updateRoleDto,
-        updatedBy: req.user.id,
-        updatedByName: req.user.firstName + req.user.lastName,
+        ...userReq(req.user, 'edit'),
       })
       .catch(
         (e) =>

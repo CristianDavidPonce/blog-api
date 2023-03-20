@@ -6,7 +6,7 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate'
 import { Role } from 'src/roles/entities/role.entity'
-import { In, Like, Repository } from 'typeorm'
+import { Like, Repository } from 'typeorm'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { User } from './entities/user.entity'
@@ -36,13 +36,37 @@ export class UsersService {
         ...(isActive !== undefined ? { isActive: isActive } : {}),
       },
       order: sort,
-      relations: { role: { permissions: true } },
+      select: [
+        'id',
+        'userName',
+        'isActive',
+        'createdBy',
+        'createdByName',
+        'createdAt',
+        'email',
+        'firstName',
+        'lastName',
+        'isActive',
+      ],
+      relations: { role: true },
     })
   }
 
   findOne(id: number) {
     return this.userRepository.findOne({
       where: { id },
+      select: [
+        'id',
+        'userName',
+        'isActive',
+        'createdBy',
+        'createdByName',
+        'createdAt',
+        'email',
+        'firstName',
+        'lastName',
+        'isActive',
+      ],
       relations: { role: { permissions: true } },
     })
   }

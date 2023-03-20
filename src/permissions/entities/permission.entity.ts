@@ -1,5 +1,6 @@
+import { Record } from 'src/common/record.common'
 import { Enumerate } from 'src/utils'
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 
 export type moduleType = 'users' | 'blogs' | 'roles'
 export type actionType = 'read' | 'edit' | 'create' | 'delete'
@@ -38,9 +39,7 @@ export const action = new Enumerate<actionType>([
 ])
 @Entity()
 @Index(['module', 'action'], { unique: true })
-export class Permission {
-  @PrimaryGeneratedColumn()
-  id: number
+export class Permission extends Record {
   @Column({ type: 'enum', enum: module.getEnum() })
   module: moduleType
   @Column({ type: 'enum', enum: action.getEnum() })

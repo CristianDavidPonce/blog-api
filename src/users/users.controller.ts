@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
   UseGuards,
   ParseBoolPipe,
+  Req,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -21,13 +22,20 @@ import * as bcrypt from 'bcrypt'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { Permissions } from 'src/permissions/permissions.decorator'
 import { PermissionsGuard } from 'src/permissions/permission.guard'
+import { IUser } from 'src/auth/auth.service'
+import { userReq } from 'src/common/record.common'
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Permissions({ module: 'users', action: 'create' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(
+    @Req() req: { user: IUser },
+    @Body() createUserDto: CreateUserDto,
+  ) {
     const saltOrRounds = 10
     const password = createUserDto.password
     if (password === undefined) {
@@ -44,7 +52,11 @@ export class UsersController {
     }
     const hash = await bcrypt.hash(password, saltOrRounds)
     return await this.usersService
-      .create({ ...createUserDto, password: hash })
+      .create({
+        ...createUserDto,
+        ...userReq(req.user, 'create'),
+        password: hash,
+      })
       .catch((err) => {
         throw new HttpException(
           { message: err.message },
@@ -85,9 +97,13 @@ export class UsersController {
   @Permissions({ module: 'users', action: 'edit' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: { user: IUser },
+  ) {
     const res = await this.usersService
-      .update(+id, updateUserDto)
+      .update(+id, { ...updateUserDto, ...userReq(req.user, 'edit') })
       .catch((err) => {
         throw new HttpException(
           { message: err.message },

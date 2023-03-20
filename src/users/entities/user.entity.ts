@@ -1,12 +1,10 @@
 import { IsEmail, IsPhoneNumber } from 'class-validator'
 import { Role } from '../../../src/roles/entities/role.entity'
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
+import { Entity, Column, ManyToOne } from 'typeorm'
+import { Record } from 'src/common/record.common'
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number
-
+export class User extends Record {
   @Column({ unique: true })
   userName: string
 
@@ -29,12 +27,6 @@ export class User {
   @Column({ nullable: true })
   @IsPhoneNumber('EC')
   phone: string
-
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
-  createAt: Date
-
-  @Column()
-  createdBy: string
 
   @ManyToOne(() => Role, (role) => role.users)
   role: Role
