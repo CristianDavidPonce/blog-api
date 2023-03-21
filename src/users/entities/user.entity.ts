@@ -1,4 +1,3 @@
-import { IsEmail, IsPhoneNumber } from 'class-validator'
 import { Role } from '../../../src/roles/entities/role.entity'
 import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
 import { Record } from 'src/common/record.common'
@@ -23,11 +22,9 @@ export class User extends Record {
   isActive: boolean
 
   @Column({ nullable: true })
-  @IsEmail()
   email: string
 
   @Column({ nullable: true })
-  @IsPhoneNumber('EC')
   phone: string
 
   @ManyToOne(() => Role, (role) => role.users)
