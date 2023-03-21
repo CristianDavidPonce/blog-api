@@ -14,36 +14,38 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common'
-import { CommentsService } from './comments.service'
-import { CreateCommentDto } from './dto/create-comment.dto'
-import { UpdateCommentDto } from './dto/update-comment.dto'
+import { BlogsService } from './blogs.service'
+import { CreateBlogDto } from './dto/create-blog.dto'
+import { UpdateBlogDto } from './dto/update-blog.dto'
 import { Permissions } from 'src/permissions/permissions.decorator'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { PermissionsGuard } from 'src/permissions/permission.guard'
 import { IUser } from 'src/auth/auth.service'
 import { userReq } from 'src/common/record.common'
 
-@Controller('comments')
-export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
-  @Permissions({ module: 'comments', action: 'create' })
+@Controller('blogs')
+export class BlogsController {
+  constructor(private readonly blogsService: BlogsService) {}
+  @Permissions({ module: 'blogs', action: 'create' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Post()
   async create(
-    @Body() createCommentDto: CreateCommentDto,
-    @Req() req: { user: IUser },
+    @Body() createTagDto: CreateBlogDto,
+    @Req() req: { user?: IUser },
   ) {
-    if (createCommentDto.blog === undefined) {
+    if (createTagDto.tags === undefined) {
       throw new HttpException(
-        { message: 'No se proporcionó un blog' },
+        {
+          message: 'No se proporcionó los tags',
+        },
         HttpStatus.BAD_REQUEST,
       )
     }
-    return await this.commentsService
+    return await this.blogsService
       .create({
-        ...createCommentDto,
+        ...createTagDto,
         ...userReq(req.user, 'create'),
-        author: req.user.id,
+        author: req.user?.id,
       })
       .catch((err) => {
         throw new HttpException(
@@ -53,7 +55,7 @@ export class CommentsController {
       })
   }
 
-  @Permissions({ module: 'comments', action: 'read' })
+  @Permissions({ module: 'blogs', action: 'read' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get()
   async findAll(
@@ -62,7 +64,7 @@ export class CommentsController {
     @Query('order') order: string,
     @Query('search') search: string,
   ) {
-    return await this.commentsService
+    return await this.blogsService
       .findAll({ page, limit }, { order, search })
       .catch((err) => {
         throw new HttpException(
@@ -72,34 +74,29 @@ export class CommentsController {
       })
   }
 
-  @Permissions({ module: 'comments', action: 'read' })
+  @Permissions({ module: 'blogs', action: 'read' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(+id)
+    return this.blogsService.findOne(+id)
   }
 
-  @Permissions({ module: 'comments', action: 'edit' })
+  @Permissions({ module: 'blogs', action: 'edit' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateCommentDto: UpdateCommentDto,
-  ) {
-    return await this.commentsService
-      .update(+id, updateCommentDto)
-      .catch((err) => {
-        throw new HttpException(
-          { message: err.message, details: err },
-          HttpStatus.BAD_REQUEST,
-        )
-      })
+  async update(@Param('id') id: string, @Body() updateTagDto: UpdateBlogDto) {
+    return await this.blogsService.update(+id, updateTagDto).catch((err) => {
+      throw new HttpException(
+        { message: err.message, details: err },
+        HttpStatus.BAD_REQUEST,
+      )
+    })
   }
 
-  @Permissions({ module: 'comments', action: 'delete' })
+  @Permissions({ module: 'blogs', action: 'delete' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.commentsService.remove(+id)
+    return this.blogsService.remove(+id)
   }
 }

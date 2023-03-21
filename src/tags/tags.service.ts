@@ -5,7 +5,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate'
-import { Repository } from 'typeorm'
+import { Like, Repository } from 'typeorm'
 import { CreateTagDto } from './dto/create-tag.dto'
 import { UpdateTagDto } from './dto/update-tag.dto'
 import { Tag } from './entities/tag.entity'
@@ -22,10 +22,13 @@ export class TagsService {
 
   findAll(
     options: IPaginationOptions,
-    { order }: { order: string },
+    { order, search }: { order: string; search?: string },
   ): Promise<Pagination<Tag>> {
     const sort = order && JSON.parse(order)
     return paginate<Tag>(this.tagRepository, options, {
+      where: {
+        ...(search ? { name: Like(`%${search}%`) } : {}),
+      },
       order: sort,
     })
   }

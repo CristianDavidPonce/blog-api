@@ -50,9 +50,10 @@ export class TagsController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('order') order: string,
+    @Query('search') search: string,
   ) {
     return await this.tagsService
-      .findAll({ page, limit }, { order })
+      .findAll({ page, limit }, { order, search })
       .catch((err) => {
         throw new HttpException(
           { message: err.message, detail: err },
