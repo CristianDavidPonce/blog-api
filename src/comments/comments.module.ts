@@ -6,12 +6,12 @@ import { Comment } from './entities/comment.entity'
 import { UsersModule } from 'src/users/users.module'
 import { User } from 'src/users/entities/user.entity'
 import { Role } from 'src/roles/entities/role.entity'
-import { Blog } from 'src/blogs/entities/blog.entity'
+import { Post } from 'src/posts/entities/post.entity'
 import { Tag } from 'src/tags/entities/tag.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Comment, User, Role, Blog, Tag]),
+    TypeOrmModule.forFeature([Comment, User, Role, Post, Tag]),
     UsersModule,
   ],
   controllers: [CommentsController],

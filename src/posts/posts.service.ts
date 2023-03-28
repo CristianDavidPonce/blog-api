@@ -8,37 +8,37 @@ import {
 import { Tag } from 'src/tags/entities/tag.entity'
 import { User } from 'src/users/entities/user.entity'
 import { In, Like, Repository } from 'typeorm'
-import { CreateBlogDto } from './dto/create-blog.dto'
-import { UpdateBlogDto } from './dto/update-blog.dto'
-import { Blog } from './entities/blog.entity'
+import { CreatePostDto } from './dto/create-post.dto'
+import { UpdatePostDto } from './dto/update-post.dto'
+import { Post } from './entities/post.entity'
 
 @Injectable()
-export class BlogsService {
+export class PostsService {
   constructor(
-    @InjectRepository(Blog)
-    private readonly blogRepository: Repository<Blog>,
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
     @InjectRepository(Tag)
     private readonly tagRepository: Repository<Tag>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  async create({ tags, author, ...createBlogDto }: CreateBlogDto) {
-    const record = this.blogRepository.create(createBlogDto)
+  async create({ tags, author, ...createPostDto }: CreatePostDto) {
+    const record = this.postRepository.create(createPostDto)
     record.tags = await this.tagRepository.findBy({
       id: In(tags),
     })
     record.author = await this.userRepository.findOneBy({
       id: author,
     })
-    return this.blogRepository.save(record)
+    return this.postRepository.save(record)
   }
 
   findAll(
     options: IPaginationOptions,
     { order, search }: { order: string; search?: string },
-  ): Promise<Pagination<Blog>> {
+  ): Promise<Pagination<Post>> {
     const sort = order && JSON.parse(order)
-    return paginate<Blog>(this.blogRepository, options, {
+    return paginate<Post>(this.postRepository, options, {
       where: {
         ...(search ? { title: Like(`%${search}%`) } : {}),
       },
@@ -48,22 +48,22 @@ export class BlogsService {
   }
 
   findOne(id: number) {
-    return this.blogRepository.findOne({
+    return this.postRepository.findOne({
       where: { id: id },
       relations: { tags: true, author: true, comments: true },
     })
   }
 
-  async update(id: number, { tags, author, ...updateBlogDto }: UpdateBlogDto) {
-    const record = this.blogRepository.create(updateBlogDto)
+  async update(id: number, { tags, author, ...updatePostDto }: UpdatePostDto) {
+    const record = this.postRepository.create(updatePostDto)
     record.tags = await this.tagRepository.findBy({
       id: In(tags),
     })
     record.id = id
-    return this.blogRepository.save(record)
+    return this.postRepository.save(record)
   }
 
   remove(id: number) {
-    return this.blogRepository.delete(id)
+    return this.postRepository.delete(id)
   }
 }

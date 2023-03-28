@@ -1,6 +1,6 @@
 import { CreateDto } from 'src/common/record.common'
 
-export class CreateBlogDto extends CreateDto {
+export class CreatePostDto extends CreateDto {
   author?: number
   tags: number[]
 }

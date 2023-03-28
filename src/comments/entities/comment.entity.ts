@@ -1,4 +1,4 @@
-import { Blog } from 'src/blogs/entities/blog.entity'
+import { Post } from 'src/posts/entities/post.entity'
 import { Record } from 'src/common/record.common'
 import { User } from 'src/users/entities/user.entity'
 import { Column, Entity, ManyToOne } from 'typeorm'
@@ -11,6 +11,6 @@ export class Comment extends Record {
   @ManyToOne(() => User, (user) => user.comments)
   author: User
 
-  @ManyToOne(() => Blog, (blog) => blog.comments)
-  blog: Blog
+  @ManyToOne(() => Post, (post) => post.comments)
+  post: Post
 }

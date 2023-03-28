@@ -14,23 +14,23 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common'
-import { BlogsService } from './blogs.service'
-import { CreateBlogDto } from './dto/create-blog.dto'
-import { UpdateBlogDto } from './dto/update-blog.dto'
+import { PostsService } from './posts.service'
+import { CreatePostDto } from './dto/create-post.dto'
+import { UpdatePostDto } from './dto/update-post.dto'
 import { Permissions } from 'src/permissions/permissions.decorator'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { PermissionsGuard } from 'src/permissions/permission.guard'
 import { IUser } from 'src/auth/auth.service'
 import { userReq } from 'src/common/record.common'
 
-@Controller('blogs')
-export class BlogsController {
-  constructor(private readonly blogsService: BlogsService) {}
-  @Permissions({ module: 'blogs', action: 'create' })
+@Controller('posts')
+export class PostsController {
+  constructor(private readonly postsService: PostsService) {}
+  @Permissions({ module: 'posts', action: 'create' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Post()
   async create(
-    @Body() createTagDto: CreateBlogDto,
+    @Body() createTagDto: CreatePostDto,
     @Req() req: { user?: IUser },
   ) {
     if (createTagDto.tags === undefined) {
@@ -41,7 +41,7 @@ export class BlogsController {
         HttpStatus.BAD_REQUEST,
       )
     }
-    return await this.blogsService
+    return await this.postsService
       .create({
         ...createTagDto,
         ...userReq(req.user, 'create'),
@@ -55,7 +55,7 @@ export class BlogsController {
       })
   }
 
-  @Permissions({ module: 'blogs', action: 'read' })
+  @Permissions({ module: 'posts', action: 'read' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get()
   async findAll(
@@ -64,7 +64,7 @@ export class BlogsController {
     @Query('order') order: string,
     @Query('search') search: string,
   ) {
-    return await this.blogsService
+    return await this.postsService
       .findAll({ page, limit }, { order, search })
       .catch((err) => {
         throw new HttpException(
@@ -74,18 +74,18 @@ export class BlogsController {
       })
   }
 
-  @Permissions({ module: 'blogs', action: 'read' })
+  @Permissions({ module: 'posts', action: 'read' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.blogsService.findOne(+id)
+    return this.postsService.findOne(+id)
   }
 
-  @Permissions({ module: 'blogs', action: 'edit' })
+  @Permissions({ module: 'posts', action: 'edit' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateTagDto: UpdateBlogDto) {
-    return await this.blogsService.update(+id, updateTagDto).catch((err) => {
+  async update(@Param('id') id: string, @Body() updateTagDto: UpdatePostDto) {
+    return await this.postsService.update(+id, updateTagDto).catch((err) => {
       throw new HttpException(
         { message: err.message, details: err },
         HttpStatus.BAD_REQUEST,
@@ -93,10 +93,10 @@ export class BlogsController {
     })
   }
 
-  @Permissions({ module: 'blogs', action: 'delete' })
+  @Permissions({ module: 'posts', action: 'delete' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.blogsService.remove(+id)
+    return this.postsService.remove(+id)
   }
 }

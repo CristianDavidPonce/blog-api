@@ -2,8 +2,8 @@ import { Record } from 'src/common/record.common'
 import { Enumerate } from 'src/utils'
 import { Column, Entity, Index } from 'typeorm'
 
-export type moduleType = 'users' | 'blogs' | 'roles' | 'tags' | 'comments'
-export type actionType = 'read' | 'edit' | 'create' | 'delete'
+export type moduleType = 'users' | 'posts' | 'roles' | 'tags' | 'comments'
+export type actionType = 'read' | 'edit' | 'create' | 'delete' | 'own'
 
 export const module = new Enumerate<moduleType>([
   {
@@ -11,8 +11,8 @@ export const module = new Enumerate<moduleType>([
     label: 'Usuarios',
   },
   {
-    value: 'blogs',
-    label: 'Blogs',
+    value: 'posts',
+    label: 'Posts',
   },
   {
     value: 'roles',
@@ -43,6 +43,10 @@ export const action = new Enumerate<actionType>([
   {
     value: 'delete',
     label: 'Borrar',
+  },
+  {
+    value: 'own',
+    label: 'Propio',
   },
 ])
 @Entity()

@@ -9,7 +9,7 @@ import { PermissionsModule } from './permissions/permissions.module'
 import { ConfigModule } from '@nestjs/config'
 import { config } from './config'
 import { DatabaseConfig } from './database.config'
-import { BlogsModule } from './blogs/blogs.module'
+import { PostsModule } from './posts/posts.module'
 import { CommentsModule } from './comments/comments.module'
 import { TagsModule } from './tags/tags.module'
 
@@ -27,7 +27,7 @@ import { TagsModule } from './tags/tags.module'
     }),
     RolesModule,
     PermissionsModule,
-    BlogsModule,
+    PostsModule,
     CommentsModule,
     TagsModule,
   ],

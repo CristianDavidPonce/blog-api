@@ -12,7 +12,7 @@ import {
 } from 'typeorm'
 
 @Entity()
-export class Blog extends Record {
+export class Post extends Record {
   @Column()
   title: string
 
@@ -22,10 +22,10 @@ export class Blog extends Record {
   @Column({ nullable: true })
   content: string
 
-  @ManyToOne(() => User, (user) => user.blogs)
+  @ManyToOne(() => User, (user) => user.posts)
   author: User
 
-  @OneToMany(() => Comment, (comment) => comment.blog)
+  @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[]
 
   @ManyToMany(() => Tag, { cascade: true })

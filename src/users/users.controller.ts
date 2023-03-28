@@ -94,6 +94,19 @@ export class UsersController {
     return this.usersService.findOne(+id)
   }
 
+  @Permissions({ module: 'users', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Get('/me/profile')
+  findMe(@Req() req: { user: IUser }) {
+    if (!req.user?.id) {
+      throw new HttpException(
+        { message: 'No se proporcionó un usuario' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    return this.usersService.findOne(+req.user.id)
+  }
+
   @Permissions({ module: 'users', action: 'edit' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Patch(':id')
@@ -104,6 +117,24 @@ export class UsersController {
   ) {
     const res = await this.usersService
       .update(+id, { ...updateUserDto, ...userReq(req.user, 'edit') })
+      .catch((err) => {
+        throw new HttpException(
+          { message: err.message },
+          HttpStatus.BAD_REQUEST,
+        )
+      })
+    return res
+  }
+
+  @Permissions({ module: 'users', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Patch('me/profile')
+  async updateMe(
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: { user: IUser },
+  ) {
+    const res = await this.usersService
+      .update(+req.user.id, { ...updateUserDto, ...userReq(req.user, 'edit') })
       .catch((err) => {
         throw new HttpException(
           { message: err.message },

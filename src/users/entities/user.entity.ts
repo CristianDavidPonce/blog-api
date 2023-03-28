@@ -1,7 +1,7 @@
 import { Role } from '../../../src/roles/entities/role.entity'
 import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
 import { Record } from 'src/common/record.common'
-import { Blog } from 'src/blogs/entities/blog.entity'
+import { Post } from 'src/posts/entities/post.entity'
 import { Comment } from 'src/comments/entities/comment.entity'
 
 @Entity()
@@ -30,9 +30,9 @@ export class User extends Record {
   @ManyToOne(() => Role, (role) => role.users)
   role: Role
 
-  @OneToMany(() => Blog, (blog) => blog.author)
-  blogs: Blog[]
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[]
 
   @OneToMany(() => Comment, (comment) => comment.author)
-  comments: Blog[]
+  comments: Post[]
 }

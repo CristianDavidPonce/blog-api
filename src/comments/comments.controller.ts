@@ -33,9 +33,9 @@ export class CommentsController {
     @Body() createCommentDto: CreateCommentDto,
     @Req() req: { user: IUser },
   ) {
-    if (createCommentDto.blog === undefined) {
+    if (createCommentDto.post === undefined) {
       throw new HttpException(
-        { message: 'No se proporcionó un blog' },
+        { message: 'No se proporcionó un post' },
         HttpStatus.BAD_REQUEST,
       )
     }

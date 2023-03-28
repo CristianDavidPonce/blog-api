@@ -5,7 +5,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate'
-import { Blog } from 'src/blogs/entities/blog.entity'
+import { Post } from 'src/posts/entities/post.entity'
 import { User } from 'src/users/entities/user.entity'
 import { Like, Repository } from 'typeorm'
 import { CreateCommentDto } from './dto/create-comment.dto'
@@ -19,16 +19,16 @@ export class CommentsService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Blog)
-    private readonly blogRepository: Repository<Blog>,
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
   ) {}
-  async create({ author, blog, ...createcommentDto }: CreateCommentDto) {
+  async create({ author, post, ...createcommentDto }: CreateCommentDto) {
     const record = this.commentRepository.create(createcommentDto)
     record.author = await this.userRepository.findOneBy({
       id: author,
     })
-    record.blog = await this.blogRepository.findOneBy({
-      id: blog,
+    record.post = await this.postRepository.findOneBy({
+      id: post,
     })
     return this.commentRepository.save(record)
   }
@@ -52,11 +52,11 @@ export class CommentsService {
 
   async update(
     id: number,
-    { author, blog, ...updatecommentDto }: UpdateCommentDto,
+    { author, post, ...updatecommentDto }: UpdateCommentDto,
   ) {
     const record = this.commentRepository.create(updatecommentDto)
-    record.blog = await this.blogRepository.findOneBy({
-      id: blog,
+    record.post = await this.postRepository.findOneBy({
+      id: post,
     })
     return this.commentRepository.update(id, record)
   }
