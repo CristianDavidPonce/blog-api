@@ -130,6 +130,13 @@ export class PostsController {
     return this.postsService.findOne(+id)
   }
 
+  @Permissions({ module: 'posts', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Get(':id')
+  findOneOwn(@Param('id') id: string) {
+    return this.postsService.findOne(+id)
+  }
+
   @Permissions({ module: 'posts', action: 'edit' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Patch(':id')
@@ -140,6 +147,23 @@ export class PostsController {
         HttpStatus.BAD_REQUEST,
       )
     })
+  }
+
+  @Permissions({ module: 'posts', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Patch(':id')
+  async updateOwn(
+    @Body() updateTagDto: UpdatePostDto,
+    @Req() req: { user: IUser },
+  ) {
+    return await this.postsService
+      .update(+req.user.id, updateTagDto)
+      .catch((err) => {
+        throw new HttpException(
+          { message: err.message, details: err },
+          HttpStatus.BAD_REQUEST,
+        )
+      })
   }
 
   @Permissions({ module: 'posts', action: 'delete' })
