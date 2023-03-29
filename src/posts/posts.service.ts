@@ -45,7 +45,7 @@ export class PostsService {
     return paginate<Post>(this.postRepository, options, {
       where: {
         ...(search ? { title: Like(`%${search}%`) } : {}),
-        ...(author ? { authorId: author } : {}),
+        ...(author ? { author: { id: author } } : {}),
       },
       order: sort,
       relations: { tags: true, author: true },
