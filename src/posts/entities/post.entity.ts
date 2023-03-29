@@ -16,11 +16,8 @@ export class Post extends Record {
   @Column()
   title: string
 
-  @Column({ nullable: true })
-  subtitle: string
-
-  @Column({ nullable: true })
-  content: string
+  @Column({ nullable: true, type: 'json' })
+  content: object
 
   @ManyToOne(() => User, (user) => user.posts)
   author: User
