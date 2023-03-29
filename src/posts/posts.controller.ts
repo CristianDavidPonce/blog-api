@@ -153,17 +153,15 @@ export class PostsController {
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Patch('manage/own/:id')
   async updateOwn(
-    @Body() updateTagDto: UpdatePostDto,
-    @Req() req: { user: IUser },
+    @Body() updatePostDto: UpdatePostDto,
+    @Param('id') id: string,
   ) {
-    return await this.postsService
-      .update(+req.user.id, updateTagDto)
-      .catch((err) => {
-        throw new HttpException(
-          { message: err.message, details: err },
-          HttpStatus.BAD_REQUEST,
-        )
-      })
+    return await this.postsService.update(+id, updatePostDto).catch((err) => {
+      throw new HttpException(
+        { message: err.message, details: err },
+        HttpStatus.BAD_REQUEST,
+      )
+    })
   }
 
   @Permissions({ module: 'posts', action: 'delete' })
