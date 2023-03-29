@@ -164,6 +164,13 @@ export class PostsController {
     })
   }
 
+  @Permissions({ module: 'posts', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Delete('manage/own/:id')
+  removeOwn(@Param('id') id: string) {
+    return this.postsService.remove(+id)
+  }
+
   @Permissions({ module: 'posts', action: 'delete' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Delete(':id')
