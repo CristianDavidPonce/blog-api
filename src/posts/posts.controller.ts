@@ -105,7 +105,7 @@ export class PostsController {
 
   @Permissions({ module: 'posts', action: 'own' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @Get()
+  @Get('manage/own')
   async findAllOwn(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
