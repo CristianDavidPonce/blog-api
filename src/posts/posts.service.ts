@@ -35,12 +35,17 @@ export class PostsService {
 
   findAll(
     options: IPaginationOptions,
-    { order, search }: { order: string; search?: string },
+    {
+      order,
+      search,
+      author,
+    }: { order: string; search?: string; author?: number },
   ): Promise<Pagination<Post>> {
     const sort = order && JSON.parse(order)
     return paginate<Post>(this.postRepository, options, {
       where: {
         ...(search ? { title: Like(`%${search}%`) } : {}),
+        ...(author ? { authorId: author } : {}),
       },
       order: sort,
       relations: { tags: true, author: true },

@@ -55,6 +55,35 @@ export class PostsController {
       })
   }
 
+  @Permissions({ module: 'posts', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Post('manage/own')
+  async createOwn(
+    @Body() createTagDto: CreatePostDto,
+    @Req() req: { user?: IUser },
+  ) {
+    if (createTagDto.tags === undefined) {
+      throw new HttpException(
+        {
+          message: 'No se proporcionó los tags',
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    return await this.postsService
+      .create({
+        ...createTagDto,
+        ...userReq(req.user, 'create'),
+        author: req.user?.id,
+      })
+      .catch((err) => {
+        throw new HttpException(
+          { message: err.message, detail: err },
+          HttpStatus.BAD_REQUEST,
+        )
+      })
+  }
+
   @Permissions({ module: 'posts', action: 'read' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get()
@@ -66,6 +95,26 @@ export class PostsController {
   ) {
     return await this.postsService
       .findAll({ page, limit }, { order, search })
+      .catch((err) => {
+        throw new HttpException(
+          { message: err.message, detail: err },
+          HttpStatus.BAD_REQUEST,
+        )
+      })
+  }
+
+  @Permissions({ module: 'posts', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Get()
+  async findAllOwn(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('order') order: string,
+    @Query('search') search: string,
+    @Req() req: { user?: IUser },
+  ) {
+    return await this.postsService
+      .findAll({ page, limit }, { order, search, author: +req.user.id })
       .catch((err) => {
         throw new HttpException(
           { message: err.message, detail: err },
