@@ -132,7 +132,7 @@ export class PostsController {
 
   @Permissions({ module: 'posts', action: 'own' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @Get(':id')
+  @Get('manage/own/:id')
   findOneOwn(@Param('id') id: string) {
     return this.postsService.findOne(+id)
   }
@@ -151,7 +151,7 @@ export class PostsController {
 
   @Permissions({ module: 'posts', action: 'own' })
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @Patch(':id')
+  @Patch('manage/own/:id')
   async updateOwn(
     @Body() updateTagDto: UpdatePostDto,
     @Req() req: { user: IUser },
