@@ -35,14 +35,16 @@ export class CommentsService {
 
   findAll(
     options: IPaginationOptions,
-    { order, search }: { order: string; search?: string },
+    { order, search, post }: { order: string; search?: string; post?: number },
   ): Promise<Pagination<Comment>> {
     const sort = order && JSON.parse(order)
     return paginate<Comment>(this.commentRepository, options, {
       where: {
         ...(search ? { description: Like(`%${search}%`) } : {}),
+        ...(post ? { post: { id: post } } : {}),
       },
       order: sort,
+      relations: { author: true },
     })
   }
 

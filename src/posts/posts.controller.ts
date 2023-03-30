@@ -84,8 +84,6 @@ export class PostsController {
       })
   }
 
-  @Permissions({ module: 'posts', action: 'read' })
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get()
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -123,8 +121,6 @@ export class PostsController {
       })
   }
 
-  @Permissions({ module: 'posts', action: 'read' })
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(+id)

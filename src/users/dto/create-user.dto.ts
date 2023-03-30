@@ -6,5 +6,5 @@ export class CreateUserDto extends CreateDto {
   isActive: boolean
   firstName: string
   lastName: string
-  role: number
+  role?: number
 }

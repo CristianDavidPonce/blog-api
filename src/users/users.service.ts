@@ -8,8 +8,9 @@ import {
 import { Role } from 'src/roles/entities/role.entity'
 import { Like, Repository } from 'typeorm'
 import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
+import { UpdatePasswordUserDto, UpdateUserDto } from './dto/update-user.dto'
 import { User } from './entities/user.entity'
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
@@ -21,7 +22,11 @@ export class UsersService {
   ) {}
   async create({ role, ...createUserDto }: CreateUserDto) {
     const record = this.userRepository.create(createUserDto)
-    record.role = await this.roleRepository.findOneBy({ id: role })
+    if (role !== undefined) {
+      record.role = await this.roleRepository.findOneBy({ id: role })
+    } else {
+      record.role = await this.roleRepository.findOneBy({ default: true })
+    }
     return this.userRepository.save(record)
   }
 
@@ -47,6 +52,7 @@ export class UsersService {
         'firstName',
         'lastName',
         'isActive',
+        'phone',
       ],
       relations: { role: true },
     })
@@ -66,6 +72,7 @@ export class UsersService {
         'firstName',
         'lastName',
         'isActive',
+        'phone',
       ],
       relations: { role: { permissions: true } },
     })
@@ -80,6 +87,19 @@ export class UsersService {
     record.role = await this.roleRepository.findOneBy({ id: role })
     record.id = id
     return this.userRepository.save(record)
+  }
+
+  async updatePassword(
+    id: number,
+    { password, lastPassword }: UpdatePasswordUserDto,
+  ) {
+    const user = await this.userRepository.findOneBy({ id: id })
+    const validation = await bcrypt.compare(lastPassword, user.password)
+    console.log(validation)
+    if (!validation) {
+      throw new Error('La contrasena  antigua es incorrecta')
+    }
+    return this.userRepository.save({ id: id, password: password })
   }
 
   async remove(id: number) {

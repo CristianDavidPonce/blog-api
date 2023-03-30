@@ -42,9 +42,11 @@ export class RolesService {
 
   async update(id: number, { permissions, ...updateRoleDto }: UpdateRoleDto) {
     const record = this.roleRepository.create(updateRoleDto)
-    record.permissions = await this.permissionRepository.findBy({
-      id: In(permissions),
-    })
+    if (permissions) {
+      record.permissions = await this.permissionRepository.findBy({
+        id: In(permissions),
+      })
+    }
     record.id = id
     return this.roleRepository.save(record)
   }

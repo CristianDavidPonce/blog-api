@@ -11,6 +11,9 @@ export class Role extends Record {
   @Column({ nullable: true })
   description: string
 
+  @Column({ nullable: true })
+  default: boolean
+
   @OneToMany(() => User, (user) => user.role)
   users: User[]
 

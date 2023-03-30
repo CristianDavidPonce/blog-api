@@ -17,14 +17,14 @@ import {
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
+import { UpdatePasswordUserDto, UpdateUserDto } from './dto/update-user.dto'
 import * as bcrypt from 'bcrypt'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { Permissions } from 'src/permissions/permissions.decorator'
 import { PermissionsGuard } from 'src/permissions/permission.guard'
 import { IUser } from 'src/auth/auth.service'
 import { userReq } from 'src/common/record.common'
-
+export const saltOrRounds = 10
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -36,7 +36,6 @@ export class UsersController {
     @Req() req: { user: IUser },
     @Body() createUserDto: CreateUserDto,
   ) {
-    const saltOrRounds = 10
     const password = createUserDto.password
     if (password === undefined) {
       throw new HttpException(
@@ -55,6 +54,36 @@ export class UsersController {
       .create({
         ...createUserDto,
         ...userReq(req.user, 'create'),
+        password: hash,
+      })
+      .catch((err) => {
+        throw new HttpException(
+          { message: err.message },
+          HttpStatus.BAD_REQUEST,
+        )
+      })
+  }
+
+  @Post('register/user')
+  async register(@Body() createUserDto: CreateUserDto) {
+    const saltOrRounds = 10
+    const password = createUserDto.password
+    if (password === undefined) {
+      throw new HttpException(
+        { message: 'No se proporcionó una contraseña' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    if (typeof password !== 'string') {
+      throw new HttpException(
+        { message: 'La constraseña debe ser de tipo string' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    const hash = await bcrypt.hash(password, saltOrRounds)
+    return await this.usersService
+      .create({
+        ...createUserDto,
         password: hash,
       })
       .catch((err) => {
@@ -135,6 +164,41 @@ export class UsersController {
   ) {
     const res = await this.usersService
       .update(+req.user.id, { ...updateUserDto, ...userReq(req.user, 'edit') })
+      .catch((err) => {
+        throw new HttpException(
+          { message: err.message },
+          HttpStatus.BAD_REQUEST,
+        )
+      })
+    return res
+  }
+
+  @Permissions({ module: 'users', action: 'own' })
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Patch('me/password')
+  async updateMePassword(
+    @Body() UpdatePasswordUserDto: UpdatePasswordUserDto,
+    @Req() req: { user: IUser },
+  ) {
+    const password = UpdatePasswordUserDto.password
+    if (password === undefined) {
+      throw new HttpException(
+        { message: 'No se proporcionó una contraseña' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    if (typeof password !== 'string') {
+      throw new HttpException(
+        { message: 'La constraseña debe ser de tipo string' },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    const hash = await bcrypt.hash(password, saltOrRounds)
+    const res = await this.usersService
+      .updatePassword(+req.user.id, {
+        ...{ ...UpdatePasswordUserDto, password: hash },
+        ...userReq(req.user, 'edit'),
+      })
       .catch((err) => {
         throw new HttpException(
           { message: err.message },

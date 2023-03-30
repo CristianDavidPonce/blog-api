@@ -53,17 +53,16 @@ export class CommentsController {
       })
   }
 
-  @Permissions({ module: 'comments', action: 'read' })
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get()
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('order') order: string,
     @Query('search') search: string,
+    @Query('post') post: string,
   ) {
     return await this.commentsService
-      .findAll({ page, limit }, { order, search })
+      .findAll({ page, limit }, { order, search, post: +post })
       .catch((err) => {
         throw new HttpException(
           { message: err.message, detail: err },
