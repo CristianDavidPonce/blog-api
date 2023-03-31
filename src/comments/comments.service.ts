@@ -44,7 +44,7 @@ export class CommentsService {
         ...(post ? { post: { id: post } } : {}),
       },
       order: sort,
-      relations: { author: true },
+      relations: { author: true, post: true },
     })
   }
 
